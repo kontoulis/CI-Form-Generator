@@ -1,5 +1,8 @@
 <?php
-//Bootstrap 3 form
+/* Bootstrap 3 style.
+ * 
+ * 
+ */
 $config=array(
     'pre'=>'<form class="form-horizontal" role="form"><div class="form-group">',
     'end'=>'</div></form>',

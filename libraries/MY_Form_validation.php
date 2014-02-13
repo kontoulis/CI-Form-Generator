@@ -1,139 +1,142 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+if (!defined('BASEPATH'))
+    exit('No direct script access allowed');
+
 class MY_Form_validation extends CI_Form_validation {
-    
-   public function __construct() {
+
+    public function __construct() {
         parent::__construct();
-     $this->ci =& get_instance();
-     $this->ci->config->load('validator');
-     
-   }
-    
-    public function set_rulesx($field, $label = '', $rules = '',$type="text",$options=array())
-	{
-		// No reason to set rules if we have no POST data
-		/*if (count($_POST) == 0)
-		{
-			return $this;
-		}*/
+        $this->ci = & get_instance();
+        $this->ci->config->load('validator');
+    }
 
-		// If an array was passed via the first parameter instead of indidual string
-		// values we cycle through it and recursively call this function.
-		if (is_array($field))
-		{
-			foreach ($field as $row)
-			{
-				// Houston, we have a problem...
-				if ( ! isset($row['field']) OR ! isset($row['rules']))
-				{
-					continue;
-				}
+    public function set_rulesx($field, $label = '', $rules = '', $type = "text", $options = array()) {
+        // No reason to set rules if we have no POST data
+        /* if (count($_POST) == 0)
+          {
+          return $this;
+          } */
 
-				// If the field label wasn't passed we use the field name
-				$label = ( ! isset($row['label'])) ? $row['field'] : $row['label'];
+        // If an array was passed via the first parameter instead of indidual string
+        // values we cycle through it and recursively call this function.
+        if (is_array($field)) {
+            foreach ($field as $row) {
+                // Houston, we have a problem...
+                if (!isset($row['field']) OR !isset($row['rules'])) {
+                    continue;
+                }
 
-				// Here we go!
-				$this->set_rules($row['field'], $label, $row['rules']);
-			}
-			return $this;
-		}
+                // If the field label wasn't passed we use the field name
+                $label = (!isset($row['label'])) ? $row['field'] : $row['label'];
 
-		// No fields? Nothing to do...
-		if ( ! is_string($field) OR  ! is_string($rules) OR $field == '')
-		{
-			return $this;
-		}
+                // Here we go!
+                $this->set_rules($row['field'], $label, $row['rules']);
+            }
+            return $this;
+        }
 
-		// If the field label wasn't passed we use the field name
-		$label = ($label == '') ? $field : $label;
+        // No fields? Nothing to do...
+        if (!is_string($field) OR !is_string($rules) OR $field == '') {
+            return $this;
+        }
 
-		// Is the field name an array?  We test for the existence of a bracket "[" in
-		// the field name to determine this.  If it is an array, we break it apart
-		// into its components so that we can fetch the corresponding POST data later
-		if (strpos($field, '[') !== FALSE AND preg_match_all('/\[(.*?)\]/', $field, $matches))
-		{
-			// Note: Due to a bug in current() that affects some versions
-			// of PHP we can not pass function call directly into it
-			$x = explode('[', $field);
-			$indexes[] = current($x);
+        // If the field label wasn't passed we use the field name
+        $label = ($label == '') ? $field : $label;
 
-			for ($i = 0; $i < count($matches['0']); $i++)
-			{
-				if ($matches['1'][$i] != '')
-				{
-					$indexes[] = $matches['1'][$i];
-				}
-			}
+        // Is the field name an array?  We test for the existence of a bracket "[" in
+        // the field name to determine this.  If it is an array, we break it apart
+        // into its components so that we can fetch the corresponding POST data later
+        if (strpos($field, '[') !== FALSE AND preg_match_all('/\[(.*?)\]/', $field, $matches)) {
+            // Note: Due to a bug in current() that affects some versions
+            // of PHP we can not pass function call directly into it
+            $x = explode('[', $field);
+            $indexes[] = current($x);
 
-			$is_array = TRUE;
-		}
-		else
-		{
-			$indexes	= array();
-			$is_array	= FALSE;
-		}
+            for ($i = 0; $i < count($matches['0']); $i++) {
+                if ($matches['1'][$i] != '') {
+                    $indexes[] = $matches['1'][$i];
+                }
+            }
 
-		// Build our master array
-		$this->_field_data[$field] = array(
-			'field'				=> $field,
-			'label'				=> $label,
-			'rules'				=> $rules,
-			'is_array'			=> $is_array,
-			'keys'				=> $indexes,
-			'postdata'			=> NULL,
-			'error'				=> '',
-			'type'				=>$type,
-                        'options'                       =>$options
-		);
-		
-		return $this;
-	}
-        function print_form(){
-	$form='';
+            $is_array = TRUE;
+        } else {
+            $indexes = array();
+            $is_array = FALSE;
+        }
+
+        // Build our master array
+        $this->_field_data[$field] = array(
+            'field' => $field,
+            'label' => $label,
+            'rules' => $rules,
+            'is_array' => $is_array,
+            'keys' => $indexes,
+            'postdata' => NULL,
+            'error' => '',
+            'type' => $type,
+            'options' => $options
+        );
+
+        return $this;
+    }
+
+    function print_form() {
+        $form = '';
         $form.=$this->ci->config->item('pre');
-	foreach ($this->_field_data as $row)
-			{
-                           if($row['type']!="checkbox" && $row['type']!="radio" && $row['type']!="select"){
-				$form.='<label for="'.$row['field'].'">'.$row['label'].'</label>';
-                                $form.='<input type="'.$row['type'].'" name="'.$row['field'].'" class="'.$this->ci->config->item('input_class').'" />';	
-                           }
-                           else if($row['type']=="checkbox" ){
-                             $form.='<div class="'.$row['type'].'">';
-                             $form.='<label>';
-                            $form.='<input type="'.$row['type'].'" value="" />';
-                             $form.=$row['label'];
-                             $form.='</label></div>';
-                           }else if($row['type']=="radio"){
-                               $checked="";
-                               foreach($row['options'] as $key => $value){
-                                   if($key=="checked" && $value=="checked") continue $checked='checked' ;
-                                 $form.='<div class="'.$row['type'].'">';
-                                
-                             $form.='<label>';
-                            
-                            $form.='<input type="'.$row['type'].'" name="'.$row['field'].'" value="'.$key.'" '.$checked.' />';
-                             $form.=$value;
-                             $form.='</label></div>';
-                             $checked="";
-                               }
-                               
-                           }else if($row['type']=="select"){
-                               
-                               $form.='<label for="'.$row['field'].'">'.$row['label'].'</label>';
-                               $form.='<select class="form-control">';
-                               foreach($row['options'] as $key => $value){
-                                 $form.='<option value="'.$key.'">'.$value.'</option>';  
-                               }
-                                $form.='</select>';
-                           }
-			}
-                        $form.=$this->ci->config->item('submit');
-                        $form.=$this->ci->config->item('end');
-			return $form;
-	//return $this->_field_data;
-	
-	}
-    
-    
-    
+        foreach ($this->_field_data as $row) {
+            if ($row['type'] != "checkbox" && $row['type'] != "radio" && $row['type'] != "select" && $row['type'] != "textarea") {
+                $form.='<label for="' . $row['field'] . '">' . $row['label'] . '</label>';
+                $form.='<input type="' . $row['type'] . '" name="' . $row['field'] . '" class="' . $this->ci->config->item('input_class') . '" />';
+            } else if ($row['type'] == "textarea") {
+                $form.='<label for="' . $row['field'] . '">' . $row['label'] . '</label>';
+                $form.='<textarea class="' . $this->ci->config->item('input_class') . '" name="' . $row['field'] . '" placeholder="' . $row['options']['placeholder'] . '" rows="' . $row['options']['rows'] . '" columns="' . $row['options']['columns'] . '"></textarea>';
+            } else if ($row['type'] == "checkbox") {
+                $checked = "";
+                $form.='<label for="' . $row['field'] . '">' . $row['label'] . '</label>';
+                foreach ($row['options'] as $key => $value) {
+                    if ($value == "checked")
+                        continue $checked = 'checked';
+                    $form.='<div class="' . $row['type'] . '">';
+
+                    $form.='<label>';
+
+                    $form.='<input type="' . $row['type'] . '" name="' . $row['field'] . '" value="' . $key . '" ' . $checked . ' />';
+                    $form.=$value;
+                    $form.='</label></div>';
+                    $checked = "";
+                }
+            }else if ($row['type'] == "radio") {
+                $checked = "";
+                $form.='<label for="' . $row['field'] . '">' . $row['label'] . '</label>';
+                foreach ($row['options'] as $key => $value) {
+                    if ($key == "checked" && $value == "checked")
+                        continue $checked = 'checked';
+                    $form.='<div class="' . $row['type'] . '">';
+
+                    $form.='<label>';
+
+                    $form.='<input type="' . $row['type'] . '" name="' . $row['field'] . '" value="' . $key . '" ' . $checked . ' />';
+                    $form.=$value;
+                    $form.='</label></div>';
+                    $checked = "";
+                }
+            }else if ($row['type'] == "select") {
+
+                $form.='<label for="' . $row['field'] . '">' . $row['label'] . '</label>';
+                $form.='<select class="form-control">';
+                foreach ($row['options'] as $key => $value) {
+                    $form.='<option value="' . $key . '">' . $value . '</option>';
+                }
+                $form.='</select>';
+            }
+        }
+        $form.=$this->ci->config->item('submit');
+        $form.=$this->ci->config->item('end');
+        return $form;
+        //return $this->_field_data;
+    }
+
 }
+
 ?>
