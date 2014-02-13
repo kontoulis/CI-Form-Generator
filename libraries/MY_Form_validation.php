@@ -96,12 +96,25 @@ class MY_Form_validation extends CI_Form_validation {
 				$form.='<label for="'.$row['field'].'">'.$row['label'].'</label>';
                                 $form.='<input type="'.$row['type'].'" name="'.$row['field'].'" class="'.$this->ci->config->item('input_class').'" />';	
                            }
-                           else if($row['type']=="checkbox" || $row['type']=="radio"){
+                           else if($row['type']=="checkbox" ){
                              $form.='<div class="'.$row['type'].'">';
                              $form.='<label>';
                             $form.='<input type="'.$row['type'].'" value="" />';
                              $form.=$row['label'];
                              $form.='</label></div>';
+                           }else if($row['type']=="radio"){
+                               $checked="";
+                               foreach($row['options'] as $key => $value){
+                                   if($key=="checked" && $value=="checked") continue $checked='checked' ;
+                                 $form.='<div class="'.$row['type'].'">';
+                                
+                             $form.='<label>';
+                            
+                            $form.='<input type="'.$row['type'].'" name="'.$row['field'].'" value="'.$key.'" '.$checked.' />';
+                             $form.=$value;
+                             $form.='</label></div>';
+                             $checked="";
+                               }
                                
                            }else if($row['type']=="select"){
                                
@@ -119,6 +132,7 @@ class MY_Form_validation extends CI_Form_validation {
 	//return $this->_field_data;
 	
 	}
+    
     
     
 }
