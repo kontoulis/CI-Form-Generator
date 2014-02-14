@@ -18,6 +18,9 @@ class Form_test extends CI_Controller {
             '1' => 'test1',
             '2' => 'test2',
             '3' => 'test3');
+			
+			//adding the 'checked' => 'checked' key-value pair will cause the following radion to be checked
+			
         $radio = array(
             '1' => 'text1',
             'checked' => 'checked',
@@ -25,6 +28,9 @@ class Form_test extends CI_Controller {
             '3' => 'text3',
             '4' => 'text4'
         );
+		
+		//similar to the radio, here you have to use only the value as 'checked' and the next checkbox will be checked
+		
         $checkbox = array(
             '1' => 'text1',
             'checked1' => 'checked',
