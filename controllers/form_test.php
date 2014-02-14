@@ -46,7 +46,7 @@ class Form_test extends CI_Controller {
         );
         
         // Function set_rulesx($field, $label = '', $rules = '', $type = "text", $options = array())
-        // You can add the type argument i fyour input is not type of text, plus the options as it is performed bellow
+        // You can add the type argument if your input is not type of text, plus the options as it is performed bellow
         
         $this->form_validation->set_rulesx('email', 'Email', 'required|valid_email', 'email');
         $this->form_validation->set_rulesx('password', 'Paasword', 'required', 'password');
@@ -80,5 +80,4 @@ class Form_test extends CI_Controller {
 
 }
 
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */
+/* End of file form_test.php */
